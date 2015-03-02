@@ -32,7 +32,7 @@ Once the extension is installed, add following code to your application configur
 return [
     //....
     'components' => [
-        'mailer' => [
+        'mailqueue' => [
             'class' => 'nterms\mailqueue\MailQueue',
 			'table' => '{{%mail_queue}}',
 			'mailsPerRound' => 10,
@@ -58,7 +58,7 @@ add following code to `/config/console.php`:
 return [
     //....
     'components' => [
-        'mailer' => [
+        'mailqueue' => [
             'class' => 'nterms\mailqueue\MailQueue',
 			'table' => '{{%mail_queue}}',
         ],
@@ -79,7 +79,7 @@ Usage
 You can then send an email to the queue as follows:
 
 ```php
-Yii::$app->mailer->compose('contact/html')
+Yii::$app->mailqueue->compose('contact/html')
      ->setFrom('from@domain.com')
      ->setTo($form->email)
      ->setSubject($form->subject)
@@ -94,7 +94,7 @@ While `nterms\mailqueue\MailQueue` extends from `yii\swiftmailer\Mailer`, you ca
 return [
     //....
     'components' => [
-        'mailer' => [
+        'mailqueue' => [
             'class' => 'nterms\mailqueue\MailQueue',
 			'table' => '{{%mail_queue}}',
 			'mailsPerRound' => 10,
@@ -115,7 +115,7 @@ return [
 And use following code for directly sending emails as you ususally do with `yii2-swiftmailer`:
 
 ```php
-Yii::$app->mailer->compose('contact/html')
+Yii::$app->mailqueue->compose('contact/html')
      ->setFrom('from@domain.com')
      ->setTo($form->email)
      ->setSubject($form->subject)
