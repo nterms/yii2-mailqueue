@@ -126,4 +126,4 @@ Yii::$app->mailqueue->compose('contact/html')
 License
 -------
 
-[MIT](LICENSE.md)
+[MIT](LICENSE)
