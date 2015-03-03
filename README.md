@@ -48,6 +48,7 @@ Following properties are available for customizing the mail queue behavior.
 - `mailsPerRound`: Number of emails to send at a time.
 - `maxAttempts`: Maximum number of sending attempts per email.
 
+
 Updating database schema
 ------------------------
 
@@ -70,6 +71,35 @@ then run `yii migrate` command in command line:
 
 ```
 php yii migrate/up --migrationPath=@vendor/nterms/yii2-mailqueue/migrations/
+```
+
+Processing the mail queue
+-------------------------
+
+Now calling `process()` on `Yii::$app->mailqueue` will process the message queue and send out the emails. 
+In one of your controller actions:
+
+```php
+
+public function actionSend()
+{
+	Yii::$app->mailqueue->process();
+}
+
+```
+
+Most preferably this could be a console command (eg: mail/send) which can be triggered by a CRON job.
+
+
+Setting the CRON job
+--------------------
+
+Set a CRON job to run console command:
+
+```
+
+*/10 * * * * php /var/www/html/myapp/yii mail/send
+
 ```
 
 
