@@ -1,4 +1,4 @@
-yii2-mailqueue
+yii2-mailqueue !!! Still Not Ready For Production Use !!!
 ========================
 
 Email queue component for yii2 that works with [yii2-swiftmailer](http://www.yiiframework.com/doc-2.0/ext-swiftmailer-index.html)
