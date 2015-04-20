@@ -8,7 +8,7 @@
 namespace nterms\mailqueue;
 
 use Yii;
-use nterms\models\Queue;
+use nterms\mailqueue\models\Queue;
 
 /**
  * Extends `yii\swiftmailer\Message` to enable queuing.
@@ -26,18 +26,34 @@ class Message extends \yii\swiftmailer\Message
 	{
 		$item = new Queue();
 		
-		$item->from = $this->from;
+		$item->from = serialize($this->from);
 		$item->to = serialize($this->getTo());
 		$item->cc = serialize($this->getCc());
 		$item->bcc = serialize($this->getBcc());
-		$item->subject = $this->getSubject();
-		$item->html_body = $this->htmlBody;
-		$item->text_body = $this->textBody;
-		$item->reply_to = $this->getReplyTo();
+		$item->reply_to = serialize($this->getReplyTo());
 		$item->charset = $this->getCharset();
-		$item->queued_time = time();
+		$item->subject = $this->getSubject();
 		$item->attempts = 0;
-		
+
+		if( $parts = $this->getSwiftMessage()->getChildren() ) {
+			foreach( $parts as $key => $part ) {
+				if( !( $part instanceof \Swift_Mime_Attachment ) ) {
+					/* @var $part \Swift_Mime_MimePart */
+					switch( $part->getContentType() ) {
+						case 'text/html':
+							$item->html_body = $part->getBody();
+						break;
+						case 'text/plain':
+							$item->text_body = $part->getBody();
+						break;
+					}
+					if( !$item->charset ) {
+						$item->charset = $part->getCharset();
+					}
+				}
+			}
+		}
+
 		return $item->save();
 	}
 }

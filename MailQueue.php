@@ -9,8 +9,8 @@ namespace nterms\mailqueue;
 
 use Yii;
 use yii\swiftmailer\Mailer;
-use yii\swiftmailer\Message;
-use nterms\models\Queue;
+use nterms\mailqueue\Message;
+use nterms\mailqueue\models\Queue;
 
 /**
  * MailQueue is a sub class of [yii\switmailer\Mailer](https://github.com/yiisoft/yii2-swiftmailer/blob/master/Mailer.php) 
@@ -78,7 +78,7 @@ class MailQueue extends Mailer
 		parent::init();
 		
 		if(Yii::$app->db->getTableSchema($this->table) == null) {
-			throw new InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
+			throw new \yii\base\InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
 		}
 	}
 	
@@ -91,22 +91,22 @@ class MailQueue extends Mailer
 	{
 		$success = true;
 		
-		$items = Queue::find()->where(['and', ['sent_time' => null], ['<', 'attempts', $this->maxAttempts]])->orderBy(['queued_time' => SORT_ASC])->limit($this->mailsPerRound)->all();
-		
+		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['<', 'attempts', $this->maxAttempts]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound)->all();
+		// dd($items);
 		if(!empty($items)) {
 			foreach($items as $item) {
 				if($message = $item->toMessage()) {
 					$attributes = ['attempts', 'last_attempt_time'];
 					
 					if($this->sendMessage($message)) {
-						$item->sent_time = time();
+						$item->sent_time = new \yii\db\Expression('NOW()');
 						$attributes[] = 'sent_time';
 					} else {
 						$success = false;
 					}
 					
-					$item->attempts = $item->attempts + 1;
-					$item->last_attempt_time = time();
+					$item->attempts++;
+					$item->last_attempt_time = new \yii\db\Expression('NOW()');
 					
 					$item->updateAttributes($attributes);
 				}
