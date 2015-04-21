@@ -1,8 +1,9 @@
 <?php
 
-namespace app\models;
+namespace nterms\mailqueue\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 use nterms\mailqueue\MailQueue;
 use nterms\mailqueue\Message;
 
@@ -18,12 +19,12 @@ use nterms\mailqueue\Message;
  * @property string $text_body
  * @property string $reply_to
  * @property string $charset
- * @property integer $queued_time
+ * @property integer $created_at
  * @property integer $attempts
  * @property integer $last_attempt_time
  * @property integer $sent_time
  */
-class Course extends \yii\db\ActiveRecord
+class Queue extends ActiveRecord
 {
     /**
      * @inheritdoc
@@ -36,25 +37,43 @@ class Course extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
+	public function behaviors()
+	{
+		return [
+			'timestamp' => [
+				'class' => 'yii\behaviors\TimestampBehavior',
+				'attributes' => [
+					ActiveRecord::EVENT_BEFORE_INSERT => ['created_at'],
+					ActiveRecord::EVENT_BEFORE_UPDATE => ['last_attempt_time'],
+				],
+				'value' => new \yii\db\Expression('NOW()'),
+			],
+		];
+	}
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
-            [['queued_time', 'attempts', 'last_attempt_time', 'sent_time'], 'integer'],
+            [['created_at', 'attempts', 'last_attempt_time', 'sent_time'], 'integer'],
             [['to', 'cc', 'bcc', 'subject', 'html_body', 'text_body', 'charset'], 'safe'],
-            [['from', 'reply_to'], 'string', 'max' => 255],
         ];
     }
 	
 	public function toMessage()
 	{
+		$from = unserialize($this->from);
 		$to = unserialize($this->to);
 		
-		if(isset($this->from) && !empty($to)) {
-			$message = new Message();
-			$cc = serialize($this->cc);
-			$bcc = serialize($this->bcc);
+		if( !empty($from) && !empty($to) ) {
+			$cc = unserialize($this->cc);
+			$bcc = unserialize($this->bcc);
+			$reply_to = unserialize($this->reply_to);
 			
-			$message->setFrom($this->from)->setTo($to);
+			$message = new Message();
+			$message->setFrom($from)->setTo($to);
 			
 			if(!empty($cc)) {
 				$message->setCc($cc);
@@ -62,6 +81,14 @@ class Course extends \yii\db\ActiveRecord
 			
 			if(!empty($bcc)) {
 				$message->setBcc($bcc);
+			}
+			
+			if(!empty($reply_to)) {
+				$message->setReplyTo(reply_to);
+			}
+
+			if(!empty($this->charset)) {
+				$message->setCharset($this->charset);
 			}
 			
 			$message->setSubject($this->subject);
@@ -72,14 +99,6 @@ class Course extends \yii\db\ActiveRecord
 			
 			if(!empty($this->text_body)) {
 				$message->setTextBody($this->text_body);
-			}
-			
-			if(!empty($this->reply_to)) {
-				$message->setReplyTo($this->reply_to);
-			}
-			
-			if(!empty($this->charset)) {
-				$message->setCharset($this->charset);
 			}
 			
 			return $message;
