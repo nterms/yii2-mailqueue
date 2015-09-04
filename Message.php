@@ -35,21 +35,26 @@ class Message extends \yii\swiftmailer\Message
 		$item->subject = $this->getSubject();
 		$item->attempts = 0;
 
-		if( $parts = $this->getSwiftMessage()->getChildren() ) {
-			foreach( $parts as $key => $part ) {
-				if( !( $part instanceof \Swift_Mime_Attachment ) ) {
-					/* @var $part \Swift_Mime_MimePart */
-					switch( $part->getContentType() ) {
-						case 'text/html':
-							$item->html_body = $part->getBody();
-						break;
-						case 'text/plain':
-							$item->text_body = $part->getBody();
-						break;
-					}
-					if( !$item->charset ) {
-						$item->charset = $part->getCharset();
-					}
+		$parts = $this->getSwiftMessage()->getChildren();
+		// if message has no parts, use message
+		if ( !is_array($parts) || !sizeof($parts) ) {
+			$parts = [ $this->getSwiftMessage() ];
+		}
+
+		foreach( $parts as $part ) {
+			if( !( $part instanceof \Swift_Mime_Attachment ) ) {
+				/* @var $part \Swift_Mime_MimeEntity */
+				switch( $part->getContentType() ) {
+					case 'text/html':
+						$item->html_body = $part->getBody();
+					break;
+					case 'text/plain':
+						$item->text_body = $part->getBody();
+					break;
+				}
+				
+				if( !$item->charset ) {
+					$item->charset = $part->getCharset();
 				}
 			}
 		}
