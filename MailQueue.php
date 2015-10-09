@@ -76,10 +76,6 @@ class MailQueue extends Mailer
 	public function init()
 	{
 		parent::init();
-		
-		if(Yii::$app->db->getTableSchema($this->table) == null) {
-			throw new \yii\base\InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
-		}
 	}
 	
 	/**
@@ -89,6 +85,10 @@ class MailQueue extends Mailer
 	 */
 	public function process()
 	{
+		if(Yii::$app->db->getTableSchema($this->table) == null) {
+			throw new \yii\base\InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
+		}
+
 		$success = true;
 		
 		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['<', 'attempts', $this->maxAttempts]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound)->all();
