@@ -23,6 +23,7 @@ use nterms\mailqueue\Message;
  * @property integer $attempts
  * @property integer $last_attempt_time
  * @property integer $sent_time
+ * @property string $time_to_send
  */
 class Queue extends ActiveRecord
 {
@@ -58,6 +59,7 @@ class Queue extends ActiveRecord
     {
         return [
             [['created_at', 'attempts', 'last_attempt_time', 'sent_time'], 'integer'],
+            [['time_to_send'], 'required'],
             [['to', 'cc', 'bcc', 'subject', 'html_body', 'text_body', 'charset'], 'safe'],
         ];
     }
