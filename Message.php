@@ -35,7 +35,7 @@ class Message extends \yii\swiftmailer\Message
 		$item->charset = $this->getCharset();
 		$item->subject = $this->getSubject();
 		$item->attempts = 0;
-		$item->time_to_send = $time_to_send;
+		$item->time_to_send = date('Y-m-d H:i:s', $time_to_send);
 
 		$parts = $this->getSwiftMessage()->getChildren();
 		// if message has no parts, use message
