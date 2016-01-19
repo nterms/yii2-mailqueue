@@ -19,10 +19,11 @@ class Message extends \yii\swiftmailer\Message
 {
 	/**
 	 * Enqueue the message storing it in database.
-	 * 
+	 *
+	 * @param timestamp $time_to_send
 	 * @return boolean true on success, false otherwise
 	 */
-	public function queue()
+	public function queue($time_to_send = time())
 	{
 		$item = new Queue();
 		
@@ -34,6 +35,7 @@ class Message extends \yii\swiftmailer\Message
 		$item->charset = $this->getCharset();
 		$item->subject = $this->getSubject();
 		$item->attempts = 0;
+		$item->time_to_send = date('Y-m-d H:i:s', $time_to_send);
 
 		$parts = $this->getSwiftMessage()->getChildren();
 		// if message has no parts, use message
