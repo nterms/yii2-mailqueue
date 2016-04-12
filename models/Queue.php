@@ -86,7 +86,7 @@ class Queue extends ActiveRecord
 			}
 			
 			if(!empty($reply_to)) {
-				$message->setReplyTo(reply_to);
+				$message->setReplyTo($reply_to);
 			}
 
 			if(!empty($this->charset)) {
