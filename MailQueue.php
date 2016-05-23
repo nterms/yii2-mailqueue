@@ -85,7 +85,7 @@ class MailQueue extends Mailer
 	 */
 	public function process()
 	{
-		if(Yii::$app->db->getTableSchema($this->table) == null) {
+		if (Yii::$app->db->getTableSchema($this->table) == null) {
 			throw new \yii\base\InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
 		}
 
@@ -93,23 +93,20 @@ class MailQueue extends Mailer
 		
 		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['!=', 'to', 'a:0:{}'], ['<', 'attempts', $this->maxAttempts], ['<=', 'time_to_send', date('Y-m-d H:i:s')]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound)->all();
 		// dd($items);
-		if(!empty($items)) {
+		if (!empty($items)) {
 			$n = count($items);
 			$pad = strlen($this->mailsPerRound);
-			echo "Begin sending $n emails:\n";
-			foreach($items as $i => $item) {
+			foreach ($items as $i => $item) {
 				$j = str_pad($i + 1, $pad, ' ', STR_PAD_LEFT);
-				if($message = $item->toMessage()) {
+				if ($message = $item->toMessage()) {
 					$attributes = ['attempts', 'last_attempt_time'];
 					$to = array_keys($message->to);
 					$to = $to[0];
-					if($this->sendMessage($message)) {
+					i f($this->sendMessage($message)) {
 						$item->sent_time = new \yii\db\Expression('NOW()');
 						$attributes[] = 'sent_time';
-						echo "$j. Sent an email with subject [{$message->subject}] to <$to>\n";
 					} else {
 						$success = false;
-						echo "$j. Cannot send the email with subject [{$message->subject}] to <$to>\n";
 					}
 					
 					$item->attempts++;
@@ -118,9 +115,7 @@ class MailQueue extends Mailer
 					$item->updateAttributes($attributes);
 				}
 			}
-		}else{
-			echo "No email to send!\n";
-		}
+		} 
 		
 		return $success;
 	}
