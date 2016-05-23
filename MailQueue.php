@@ -102,7 +102,7 @@ class MailQueue extends Mailer
 					$attributes = ['attempts', 'last_attempt_time'];
 					$to = array_keys($message->to);
 					$to = $to[0];
-					i f($this->sendMessage($message)) {
+					if ($this->sendMessage($message)) {
 						$item->sent_time = new \yii\db\Expression('NOW()');
 						$attributes[] = 'sent_time';
 					} else {
