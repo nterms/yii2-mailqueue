@@ -20,5 +20,8 @@
 		"psr-4": {
 			"nterms\\mailqueue\\": ""
 		}
-	}
+	},
+        "extra": {
+            "bootstrap": "nterms\\mailqueue\\Bootstrap"            
+        }
 }
