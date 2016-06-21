@@ -6,7 +6,7 @@
  * @author Rochdi B. <rochdi80tn@gmail.com>
  */
 
-namespace nterms\mailqueue;
+namespace nterms\mailqueue\commands;
 
 use yii\console\Controller;
 
@@ -18,10 +18,13 @@ use yii\console\Controller;
  */
 class MailQueueController extends Controller
 {
+    
+    public $defaultAction = 'process';
+      
     /**
      * This command processes the mail queue     
      */
-    public function actionIndex()
+    public function actionProcess()
     {
         \Yii::$app->mailqueue->process();
     }
