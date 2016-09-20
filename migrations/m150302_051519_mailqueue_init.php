@@ -13,6 +13,11 @@ class m150302_051519_mailqueue_init extends Migration
 {
     public function up()
     {
+		$tableOptions = null;
+		if ($this->db->driverName === 'mysql') {
+			$tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+		}
+		
 		$this->createTable(Yii::$app->get(MailQueue::NAME)->table, [
 			'id' => Schema::TYPE_PK,
 			'from' => Schema::TYPE_TEXT,
@@ -28,7 +33,7 @@ class m150302_051519_mailqueue_init extends Migration
 			'attempts' => Schema::TYPE_INTEGER,
 			'last_attempt_time' => Schema::TYPE_DATETIME . ' DEFAULT NULL',
 			'sent_time' => Schema::TYPE_DATETIME . ' DEFAULT NULL',
-		], 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB');
+		], $tableOptions);
     }
 
     public function down()
