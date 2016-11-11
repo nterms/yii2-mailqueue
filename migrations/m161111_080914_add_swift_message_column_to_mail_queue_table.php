@@ -12,7 +12,7 @@ class m161111_080914_add_swift_message_column_to_mail_queue_table extends Migrat
      */
     public function up()
     {
-        $this->addColumn('mail_queue', 'swift_message', $this->longtext());
+        $this->addColumn(Yii::$app->get(MailQueue::NAME)->table, 'swift_message', $this->longtext());
     }
 
     /**
@@ -20,6 +20,6 @@ class m161111_080914_add_swift_message_column_to_mail_queue_table extends Migrat
      */
     public function down()
     {
-        $this->dropColumn('mail_queue', 'swift_message');
+        $this->dropColumn(Yii::$app->get(MailQueue::NAME)->table, 'swift_message');
     }
 }
