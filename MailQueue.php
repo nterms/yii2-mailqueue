@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
  * MailQueue.php
@@ -13,11 +13,11 @@ use nterms\mailqueue\Message;
 use nterms\mailqueue\models\Queue;
 
 /**
- * MailQueue is a sub class of [yii\switmailer\Mailer](https://github.com/yiisoft/yii2-swiftmailer/blob/master/Mailer.php) 
+ * MailQueue is a sub class of [yii\switmailer\Mailer](https://github.com/yiisoft/yii2-swiftmailer/blob/master/Mailer.php)
  * which intends to replace it.
- * 
+ *
  * Configuration is the same as in `yii\switmailer\Mailer` with some additional properties to control the mail queue
- * 
+ *
  * ~~~
  * 	'components' => [
  * 		...
@@ -38,38 +38,38 @@ use nterms\mailqueue\models\Queue;
  * 		...
  * 	],
  * ~~~
- * 
+ *
  * @see http://www.yiiframework.com/doc-2.0/yii-swiftmailer-mailer.html
  * @see http://www.yiiframework.com/doc-2.0/ext-swiftmailer-index.html
- * 
- * This extension replaces `yii\switmailer\Message` with `nterms\mailqueue\Message' 
+ *
+ * This extension replaces `yii\switmailer\Message` with `nterms\mailqueue\Message'
  * to enable queuing right from the message.
- * 
+ *
  */
 class MailQueue extends Mailer
 {
 	const NAME = 'mailqueue';
-	
+
 	/**
 	 * @var string message default class name.
 	 */
 	public $messageClass = 'nterms\mailqueue\Message';
-	
+
 	/**
 	 * @var string the name of the database table to store the mail queue.
 	 */
 	public $table = '{{%mail_queue}}';
-	
+
 	/**
 	 * @var integer the default value for the number of mails to be sent out per processing round.
 	 */
 	public $mailsPerRound = 10;
-	
+
 	/**
 	 * @var integer maximum number of attempts to try sending an email out.
 	 */
 	public $maxAttempts = 3;
-	
+
 	/**
 	 * Initializes the MailQueue component.
 	 */
@@ -77,10 +77,10 @@ class MailQueue extends Mailer
 	{
 		parent::init();
 	}
-	
+
 	/**
 	 * Sends out the messages in email queue and update the database.
-	 * 
+	 *
 	 * @return boolean true if all messages are successfully sent out
 	 */
 	public function process()
@@ -90,33 +90,26 @@ class MailQueue extends Mailer
 		}
 
 		$success = true;
-		
-		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['!=', 'to', 'a:0:{}'], ['<', 'attempts', $this->maxAttempts], ['<=', 'time_to_send', date('Y-m-d H:i:s')]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound)->all();
-		// dd($items);
-		if (!empty($items)) {
-			$n = count($items);
-			$pad = strlen($this->mailsPerRound);
-			foreach ($items as $i => $item) {
-				$j = str_pad($i + 1, $pad, ' ', STR_PAD_LEFT);
-				if ($message = $item->toMessage()) {
-					$attributes = ['attempts', 'last_attempt_time'];
-					$to = array_keys($message->to);
-					$to = $to[0];
-					if ($message->send($this)) {
-						$item->sent_time = new \yii\db\Expression('NOW()');
-						$attributes[] = 'sent_time';
-					} else {
-						$success = false;
-					}
-					
-					$item->attempts++;
-					$item->last_attempt_time = new \yii\db\Expression('NOW()');
-					
-					$item->updateAttributes($attributes);
-				}
+
+		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['!=', 'to', 'a:0:{}'], ['<', 'attempts', $this->maxAttempts], ['<=', 'time_to_send', date('Y-m-d H:i:s')]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound);
+		foreach ($items->each() as $item) {
+		    if ($message = $item->toMessage()) {
+			$attributes = ['attempts', 'last_attempt_time'];
+			if ($this->send($message)) {
+			    $item->sent_time = new \yii\db\Expression('NOW()');
+			    $attributes[] = 'sent_time';
+			} else {
+			    $success = false;
 			}
-		} 
-		
+
+			$item->attempts++;
+			$item->last_attempt_time = new \yii\db\Expression('NOW()');
+
+			$item->updateAttributes($attributes);
+		    }
+		}
+
+
 		return $success;
 	}
 }
