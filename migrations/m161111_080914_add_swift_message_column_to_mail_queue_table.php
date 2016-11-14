@@ -12,7 +12,7 @@ class m161111_080914_add_swift_message_column_to_mail_queue_table extends Migrat
      */
     public function up()
     {
-        $this->addColumn(Yii::$app->get(MailQueue::NAME)->table, 'swift_message', $this->longtext());
+        $this->addColumn(Yii::$app->get(MailQueue::NAME)->table, 'swift_message', 'text');
     }
 
     /**
