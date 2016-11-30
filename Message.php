@@ -39,7 +39,7 @@ class Message extends \yii\swiftmailer\Message
         $item->charset = $this->getCharset();
         $item->subject = $this->getSubject();
         $item->attempts = 0;
-        $item->swift_message = serialize($this);
+        $item->swift_message = base64_encode(serialize($this));
         $item->time_to_send = date('Y-m-d H:i:s', $time_to_send);
 
         $parts = $this->getSwiftMessage()->getChildren();
