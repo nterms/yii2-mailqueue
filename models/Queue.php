@@ -67,6 +67,6 @@ class Queue extends ActiveRecord
 
 	public function toMessage()
 	{
-		return unserialize($this->swift_message);
+		return unserialize(base64_decode($this->swift_message));
 	}
 }
