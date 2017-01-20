@@ -98,7 +98,7 @@ Set a CRON job to run console command:
 
 ```
 
-*/10 * * * * php /var/www/html/myapp/yii mail/send
+*/10 * * * * php /var/www/html/myapp/yii mailqueue/process
 
 ```
 
