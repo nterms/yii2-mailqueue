@@ -16,7 +16,7 @@ use nterms\mailqueue\Message;
  * @property integer $last_attempt_time
  * @property integer $sent_time
  * @property string $time_to_send
- * @property string swift_message
+ * @property string $swift_message
  */
 class Queue extends ActiveRecord
 {
