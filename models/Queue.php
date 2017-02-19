@@ -10,21 +10,13 @@ use nterms\mailqueue\Message;
 /**
  * This is the model class for table "{{%mail_queue}}".
  *
- * @property string $from
- * @property string $to
- * @property string $cc
- * @property string $bcc
  * @property string $subject
- * @property string $html_body
- * @property string $text_body
- * @property string $reply_to
- * @property string $charset
  * @property integer $created_at
  * @property integer $attempts
  * @property integer $last_attempt_time
  * @property integer $sent_time
  * @property string $time_to_send
- * @property string swift_message
+ * @property string $swift_message
  */
 class Queue extends ActiveRecord
 {
@@ -61,7 +53,7 @@ class Queue extends ActiveRecord
         return [
             [['created_at', 'attempts', 'last_attempt_time', 'sent_time'], 'integer'],
             [['time_to_send', 'swift_message'], 'required'],
-            [['to', 'cc', 'bcc', 'subject', 'html_body', 'text_body', 'charset'], 'safe'],
+            [['subject'], 'safe'],
         ];
     }
 
