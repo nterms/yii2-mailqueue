@@ -24,8 +24,8 @@ class MailQueueController extends Controller
     /**
      * This command processes the mail queue     
      */
-    public function actionProcess()
+    public function actionProcess($qty = null)
     {
-        \Yii::$app->mailqueue->process();
+        \Yii::$app->mailqueue->process($qty);
     }
 }
