@@ -81,9 +81,10 @@ class MailQueue extends Mailer
 	/**
 	 * Sends out the messages in email queue and update the database.
 	 *
+	 * @param int $qty the number of mails to be sent
 	 * @return boolean true if all messages are successfully sent out
 	 */
-	public function process()
+	public function process($qty = null)
 	{
 		if (Yii::$app->db->getTableSchema($this->table) == null) {
 			throw new \yii\base\InvalidConfigException('"' . $this->table . '" not found in database. Make sure the db migration is properly done and the table is created.');
@@ -91,7 +92,7 @@ class MailQueue extends Mailer
 
 		$success = true;
 
-		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['<', 'attempts', $this->maxAttempts], ['<=', 'time_to_send', date('Y-m-d H:i:s')]])->orderBy(['created_at' => SORT_ASC])->limit($this->mailsPerRound);
+		$items = Queue::find()->where(['and', ['sent_time' => NULL], ['<', 'attempts', $this->maxAttempts], ['<=', 'time_to_send', date('Y-m-d H:i:s')]])->orderBy(['created_at' => SORT_ASC])->limit($qty ?: $this->mailsPerRound);
 		foreach ($items->each() as $item) {
 		    if ($message = $item->toMessage()) {
 			$attributes = ['attempts', 'last_attempt_time'];
