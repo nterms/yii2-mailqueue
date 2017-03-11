@@ -69,6 +69,12 @@ class MailQueue extends Mailer
 	 * @var integer maximum number of attempts to try sending an email out.
 	 */
 	public $maxAttempts = 3;
+	
+	
+	/**
+	 * @var boolean Purges messages from queue after sending
+	 */
+	public $autoPurge = true;
 
 	/**
 	 * Initializes the MailQueue component.
@@ -108,8 +114,24 @@ class MailQueue extends Mailer
 			$item->updateAttributes($attributes);
 		    }
 		}
-
+	
+		// Purge messages now?
+		if ($this->autoPurge) {
+			$this->purge();
+		}
 
 		return $success;
+	}
+	
+	
+	/**
+	 * Deletes sent messages from queue.
+	 *
+	 * @return int Number of rows deleted
+	 */
+	
+	public function purge()
+	{
+		return Queue::deleteAll('sent_time IS NOT NULL');
 	}
 }
