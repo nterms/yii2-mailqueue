@@ -81,9 +81,9 @@ In one of your controller actions:
 
 ```php
 
-public function actionSend()
+public function actionSend($qty = null)
 {
-	Yii::$app->mailqueue->process();
+	Yii::$app->mailqueue->process($qty);
 }
 
 ```
@@ -98,7 +98,7 @@ Set a CRON job to run console command:
 
 ```
 
-*/10 * * * * php /var/www/html/myapp/yii mailqueue/process
+*/10 * * * * php /var/www/html/myapp/yii mailqueue/process 25
 
 ```
 
