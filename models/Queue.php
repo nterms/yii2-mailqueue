@@ -17,6 +17,7 @@ use nterms\mailqueue\Message;
  * @property integer $sent_time
  * @property string $time_to_send
  * @property string $swift_message
+ * @property integer $priority
  */
 class Queue extends ActiveRecord
 {
@@ -51,7 +52,7 @@ class Queue extends ActiveRecord
     public function rules()
     {
         return [
-            [['created_at', 'attempts', 'last_attempt_time', 'sent_time'], 'integer'],
+            [['created_at', 'attempts', 'last_attempt_time', 'sent_time', 'integer'], 'integer'],
             [['time_to_send', 'swift_message'], 'required'],
             [['subject'], 'safe'],
         ];

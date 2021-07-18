@@ -153,6 +153,27 @@ Yii::$app->mailqueue->compose('contact/html')
      ->send();
 ```
 
+Priorities
+----------
+
+You can set a priority to the message:
+
+```php
+Yii::$app->mailqueue->compose('contact/html')
+     ->setQueuePriority(500)
+     ->setFrom('from@domain.com')
+     ->setTo($form->email)
+     ->setSubject($form->subject)
+     ->setTextBody($form->body)
+     ->queue();
+```
+
+Default priority is 1000 so passing any lower number will make that that emails gets sent before others. 
+
+In the same way, if you pass a number bigger than 1000, those messages are going to have very low priority in the queue. 
+
+Why 1000 as default? Just to give enough room to accomodate at most 999 other priorities.
+
 License
 -------
 

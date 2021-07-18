@@ -17,6 +17,14 @@ use nterms\mailqueue\models\Queue;
  */
 class Message extends \yii\swiftmailer\Message
 {
+
+    public $priority = 1000;
+
+    public function setQueuePriority($priority = 1000)
+    {
+        $this->priority = $priority;
+    }
+
     /**
      * Enqueue the message storing it in database.
      *
@@ -25,16 +33,17 @@ class Message extends \yii\swiftmailer\Message
      */
     public function queue($time_to_send = 'now')
     {
-        if($time_to_send == 'now') {
+        if ($time_to_send == 'now') {
             $time_to_send = time();
         }
 
-        $item = new Queue();
-
-        $item->subject = $this->getSubject();
-        $item->attempts = 0;
-        $item->swift_message = base64_encode(serialize($this));
-        $item->time_to_send = date('Y-m-d H:i:s', $time_to_send);
+        $item = new Queue([
+            'priority' => $this->priority,
+            'subject' => $this->getSubject(),
+            'attempts' => 0,
+            'swift_message' => base64_encode(serialize($this)),
+            'time_to_send' => date('Y-m-d H:i:s', $time_to_send),
+        ]);
 
         return $item->save();
     }
