@@ -101,13 +101,14 @@ class MailQueue extends Mailer
 		foreach ($items->each() as $item) {
 		    if ($message = $item->toMessage()) {
 			$attributes = ['attempts', 'last_attempt_time'];
-			if ($this->send($message)) {
-			    $item->sent_time = new \yii\db\Expression('NOW()');
-			    $attributes[] = 'sent_time';
-			} else {
-			    $success = false;
+			try {
+				$this->send($message);
+				$item->sent_time = new \yii\db\Expression('NOW()');
+				$attributes[] = 'sent_time';
+			} catch (\Swift_IoException $exception) {
+				Yii::error($exception->getMessage(), 'nterms/yii2-mailqueue');
+				$success = false;
 			}
-
 			$item->attempts++;
 			$item->last_attempt_time = new \yii\db\Expression('NOW()');
 
